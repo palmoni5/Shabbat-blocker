@@ -42,7 +42,7 @@ async function checkShabbatStatus() {
 async function blockPage() {
     try {
         // טעינת תוכן דף השבת
-        const response = await fetch('/Sabbath', {
+        const response = await fetch('/forum/Sabbath', {
             cache: 'no-cache'
         });
         
