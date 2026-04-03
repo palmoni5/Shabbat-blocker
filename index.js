@@ -1,3 +1,4 @@
+console.log("דף זה שומר שבת!");
 (function() {
     function checkTime() {
         var now = new Date();
