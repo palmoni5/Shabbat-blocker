@@ -21,7 +21,7 @@ async function checkShabbatStatus() {
         const data = await response.json();
 
         // בדיקה האם אסור במלאכה (שבת או יום טוב)
-        if (data && data.status && data.status.isAssurBemlacha === false) {
+        if (data && data.status && data.status.isAssurBemlacha === true) {
             // הדפסה לקונסול
             console.log(blockMessage);
 
