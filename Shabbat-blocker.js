@@ -25,8 +25,8 @@ async function checkShabbatStatus() {
             // הדפסה לקונסול
             console.log(blockMessage);
 
-            // חסימת הדף באמצעות הוספת שכבת כיסוי (Overlay)
-            blockPage(blockMessage);
+            // חסימת הדף באמצעות טעינת תוכן דף השבת
+            await blockPage();
         }
         // אם isAssurBemlacha הוא false, הקוד מסתיים ולא עושה כלום.
 
@@ -37,41 +37,62 @@ async function checkShabbatStatus() {
 }
 
 /**
- * פונקציית עזר ליצירת שכבת החסימה על המסך
- * @param {string} message - ההודעה שתוצג על המסך
+ * פונקציית עזר לטעינת תוכן דף השבת והחלפת התוכן הנוכחי
  */
-function blockPage(message) {
-    // יצירת אלמנט div חדש
-    const overlay = document.createElement('div');
-    
-    // עיצוב האלמנט כך שיכסה את כל המסך וימנע אינטראקציה
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100vw';
-    overlay.style.height = '100vh';
-    overlay.style.backgroundColor = '#ffffff'; // רקע לבן ואטום
-    overlay.style.color = '#000000';
-    overlay.style.display = 'flex';
-    overlay.style.alignItems = 'center';
-    overlay.style.justifyContent = 'center';
-    overlay.style.fontSize = '32px';
-    overlay.style.fontFamily = 'Arial, sans-serif';
-    overlay.style.fontWeight = 'bold';
-    overlay.style.zIndex = '2147483647'; // z-index מקסימלי כדי שיהיה מעל הכל
-    overlay.style.direction = 'rtl';
-    overlay.style.textAlign = 'center';
-    overlay.style.padding = '20px';
-    overlay.style.boxSizing = 'border-box';
-    
-    // הוספת הטקסט
-    overlay.innerText = message;
-    
-    // ביטול אפשרות גלילה באתר עצמו
-    document.body.style.overflow = 'hidden';
-    
-    // הוספת שכבת הכיסוי לדף
-    document.body.appendChild(overlay);
+async function blockPage() {
+    try {
+        // טעינת תוכן דף השבת
+        const response = await fetch('/Sabbath', {
+            cache: 'no-cache'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const sabbathContent = await response.text();
+        
+        // החלפת כל התוכן של הדף בתוכן דף השבת
+        document.documentElement.innerHTML = sabbathContent;
+        
+    } catch (error) {
+        console.error('שגיאה בטעינת דף השבת:', error);
+        
+        // במקרה של שגיאה, הצגת הודעה פשוטה
+        const fallbackMessage = 'הדף אינו פעיל בשבת\\ימים טובים לפי שעון ירושלים';
+        
+        // יצירת אלמנט div חדש
+        const overlay = document.createElement('div');
+        
+        // עיצוב האלמנט כך שיכסה את כל המסך וימנע אינטראקציה
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100vw';
+        overlay.style.height = '100vh';
+        overlay.style.backgroundColor = '#ffffff';
+        overlay.style.color = '#000000';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.fontSize = '32px';
+        overlay.style.fontFamily = 'Arial, sans-serif';
+        overlay.style.fontWeight = 'bold';
+        overlay.style.zIndex = '2147483647';
+        overlay.style.direction = 'rtl';
+        overlay.style.textAlign = 'center';
+        overlay.style.padding = '20px';
+        overlay.style.boxSizing = 'border-box';
+        
+        // הוספת הטקסט
+        overlay.innerText = fallbackMessage;
+        
+        // ביטול אפשרות גלילה באתר עצמו
+        document.body.style.overflow = 'hidden';
+        
+        // הוספת שכבת הכיסוי לדף
+        document.body.appendChild(overlay);
+    }
 }
 
 // הפעלת הפונקציה בעת טעינת הסקריפט
